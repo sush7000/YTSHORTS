@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts FINAL AutoPlay Fixed</title>
+<title>Baby Shorts Final AutoPlay ScrollFix</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -43,7 +43,6 @@
 </head>
 <body>
 
-<!-- Container for Videos -->
 <div id="shortsContainer"></div>
 
 <script>
@@ -64,6 +63,7 @@ const db = firebase.database();
 let players = [];
 let videosReady = false;
 
+// Shuffle Function
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -72,6 +72,7 @@ function shuffle(array) {
     return array;
 }
 
+// Fetch videos from Firebase
 firebase.database().ref('videos').once('value').then(snapshot => {
     const videoList = snapshot.val();
     const container = document.getElementById('shortsContainer');
@@ -85,7 +86,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0&mute=1&autoplay=1"; // Autoplay + Mute
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0";
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -103,39 +104,39 @@ function onYouTubeIframeAPIReady() {
             clearInterval(interval);
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach((iframe, index) => {
-                players[index] = new YT.Player(iframe.id, {
-                    events: {
-                        'onReady': function (event) {
-                            // No action on ready
-                        }
-                    }
-                });
+                players[index] = new YT.Player(iframe.id);
             });
 
             window.addEventListener('scroll', () => {
                 controlPlayback();
             });
 
-            controlPlayback(); // Initial call
+            // Start 1st video
+            setTimeout(() => {
+                controlPlayback();
+            }, 1000);
         }
     }, 500);
 }
 
+// Real control playback
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
-    let centerFound = false;
+    let activeIndex = -1;
 
+    // Find the currently center video
     wrappers.forEach((wrapper, index) => {
         const rect = wrapper.getBoundingClientRect();
-        const player = players[index];
-        
+        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+            activeIndex = index;
+        }
+    });
+
+    // Now control all players
+    players.forEach((player, index) => {
         if (player && player.playVideo && player.pauseVideo) {
-            if (!centerFound && rect.top >= 0 && rect.top <= window.innerHeight/2) {
+            if (index === activeIndex) {
                 player.playVideo();
-                try {
-                    player.unMute(); // Try to unmute
-                } catch (e) {}
-                centerFound = true;
             } else {
                 player.pauseVideo();
             }

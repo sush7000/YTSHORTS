@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts AutoPlay (Firebase Random)</title>
+<title>Baby Shorts AutoPlay Fixed</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -87,7 +87,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=1"; // controls=1 to allow volume, seek
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0";
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -98,34 +98,41 @@ firebase.database().ref('videos').once('value').then(snapshot => {
     }
 });
 
-// Wait for videos + YouTube API
 function onYouTubeIframeAPIReady() {
     const interval = setInterval(() => {
         if (videosReady) {
             clearInterval(interval);
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach((iframe, index) => {
-                players[index] = new YT.Player(iframe.id);
+                players[index] = new YT.Player(iframe.id, {
+                    events: {
+                        'onReady': function (event) {
+                            if (index === 0) {
+                                event.target.playVideo(); // Start first video
+                            }
+                        }
+                    }
+                });
             });
 
             window.addEventListener('scroll', () => {
                 controlPlayback();
             });
-            controlPlayback();
         }
     }, 500);
 }
 
-// Control playback during scroll
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     wrappers.forEach((wrapper, index) => {
         const rect = wrapper.getBoundingClientRect();
         const player = players[index];
-        if (player && player.playVideo && rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-            player.playVideo();
-        } else if (player && player.pauseVideo) {
-            player.pauseVideo();
+        if (player && player.playVideo && player.pauseVideo) {
+            if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
+                player.playVideo();
+            } else {
+                player.pauseVideo();
+            }
         }
     });
 }

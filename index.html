@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Full YouTube UI - AutoPlay</title>
+<title>Baby Shorts Responsive YouTube UI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -20,11 +21,14 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
+        padding: 10px;
     }
-    iframe {
-        width: 356px;
-        height: 634px;
+    .video-frame {
+        width: 100%;
+        max-width: 400px;
+        aspect-ratio: 9/16;
         border: none;
+        background: black;
     }
 </style>
 </head>
@@ -32,7 +36,7 @@
 
 <!-- Reel 1 -->
 <div class="shorts-wrapper">
-    <iframe id="video1"
+    <iframe class="video-frame" id="video1"
         src="https://www.youtube.com/embed/AlFUEdCKmVA?enablejsapi=1&autoplay=1&mute=1"
         title="कल है exam🤣"
         frameborder="0"
@@ -43,7 +47,7 @@
 
 <!-- Reel 2 -->
 <div class="shorts-wrapper">
-    <iframe id="video2"
+    <iframe class="video-frame" id="video2"
         src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&autoplay=0&mute=1"
         title="Funny video"
         frameborder="0"
@@ -54,7 +58,7 @@
 
 <!-- Reel 3 -->
 <div class="shorts-wrapper">
-    <iframe id="video3"
+    <iframe class="video-frame" id="video3"
         src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&autoplay=0&mute=1"
         title="Another Shorts"
         frameborder="0"

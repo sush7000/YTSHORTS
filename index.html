@@ -2,21 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>100 YouTube Shorts AutoPlay Mute</title>
+<title>Vertical 100 Shorts AutoPlay Mute</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
     body {
         margin: 0;
         background: black;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 10px;
-        padding: 10px;
+        padding: 10px 0;
     }
     iframe {
-        width: 100%;
-        aspect-ratio: 9/16;
+        width: 360px; /* YouTube shorts size */
+        height: 640px;
+        max-width: 100%;
         border: none;
         background: black;
     }
@@ -62,11 +64,10 @@ firebase.database().ref('videos').once('value').then(snapshot => {
         const container = document.getElementById('shortsContainer');
         const videos = shuffle(Object.values(videoList));
 
-        // 100 videos
         for (let i = 0; i < 100; i++) {
             const randomVideo = videos[Math.floor(Math.random() * videos.length)];
-
-            // Correct embed URL with autoplay+mute
+            
+            // Correct embed URL with autoplay+mute+loop
             let embedUrl = randomVideo
                 .replace("watch?v=", "embed/")
                 .replace("shorts/", "embed/")

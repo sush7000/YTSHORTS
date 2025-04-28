@@ -2,31 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Perfect AutoPlay</title>
+<title>100 YouTube Shorts AutoPlay (PC Version)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-        height: 100%;
-        overflow-y: scroll;
-        scroll-snap-type: y mandatory;
-        scroll-behavior: smooth;
+    body {
+        margin: 0;
         background: black;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 10px;
+        padding: 10px;
     }
-    .shorts-wrapper {
+    iframe {
         width: 100%;
-        height: 100vh;
-        scroll-snap-align: start;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-        padding: 5px;
-    }
-    .video-frame {
-        width: 100%;
-        max-width: 400px;
         aspect-ratio: 9/16;
         border: none;
         background: black;
@@ -61,9 +50,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let players = [];
-let videosReady = false;
 
-// Shuffle Function
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -75,73 +62,39 @@ function shuffle(array) {
 // Fetch videos from Firebase
 firebase.database().ref('videos').once('value').then(snapshot => {
     const videoList = snapshot.val();
-    const container = document.getElementById('shortsContainer');
-
     if (videoList) {
+        const container = document.getElementById('shortsContainer');
         const videos = shuffle(Object.values(videoList));
-        videos.forEach((videoUrl, index) => {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'shorts-wrapper';
 
+        // 100 videos
+        for (let i = 0; i < 100; i++) {
+            const randomVideo = videos[Math.floor(Math.random() * videos.length)];
             const iframe = document.createElement('iframe');
-            iframe.className = 'video-frame';
-            iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0";
+            iframe.id = `video${i}`;
+            iframe.src = randomVideo + "?enablejsapi=1&rel=0&controls=0&mute=1"; // mute=1 for autoplay allowed
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
-
-            wrapper.appendChild(iframe);
-            container.appendChild(wrapper);
-        });
-        videosReady = true;
+            container.appendChild(iframe);
+        }
     }
 });
 
 function onYouTubeIframeAPIReady() {
     const interval = setInterval(() => {
-        if (videosReady) {
+        const iframes = document.querySelectorAll('iframe');
+        if (iframes.length > 0) {
             clearInterval(interval);
-            const iframes = document.querySelectorAll('iframe');
             iframes.forEach((iframe, index) => {
-                players[index] = new YT.Player(iframe.id);
+                players[index] = new YT.Player(iframe.id, {
+                    events: {
+                        'onReady': function (event) {
+                            event.target.playVideo(); // Start playing automatically
+                        }
+                    }
+                });
             });
-
-            window.addEventListener('scroll', controlPlayback);
-
-            // After a small delay, auto-play first reel
-            setTimeout(() => {
-                playFirstVideo();
-            }, 1000);
         }
-    }, 500);
-}
-
-function playFirstVideo() {
-    if (players[0] && players[0].playVideo) {
-        players[0].playVideo();
-    }
-}
-
-function controlPlayback() {
-    const wrappers = document.querySelectorAll('.shorts-wrapper');
-    let activeIndex = -1;
-
-    wrappers.forEach((wrapper, index) => {
-        const rect = wrapper.getBoundingClientRect();
-        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-            activeIndex = index;
-        }
-    });
-
-    players.forEach((player, index) => {
-        if (player && player.playVideo && player.pauseVideo) {
-            if (index === activeIndex) {
-                player.playVideo();
-            } else {
-                player.pauseVideo();
-            }
-        }
-    });
+    }, 1000);
 }
 </script>
 

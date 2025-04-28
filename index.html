@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Baby Reels</title>
+<title>Baby Reels</title>
 <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {margin: 0; padding: 0; box-sizing: border-box;}
     html, body {
         height: 100%;
         scroll-snap-type: y mandatory;
@@ -20,57 +20,46 @@
         align-items: center;
         justify-content: center;
     }
-    iframe {
+    video {
         width: 100%;
         height: 100%;
-        border: none;
+        object-fit: cover;
     }
 </style>
 </head>
 <body>
 
-<!-- Video 1 -->
+<!-- First Video -->
 <div class="video-container">
-    <iframe id="video1" src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <video id="vid1" src="video1.mp4" playsinline muted autoplay loop></video>
 </div>
 
-<!-- Video 2 -->
+<!-- Second Video -->
 <div class="video-container">
-    <iframe id="video2" src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <video id="vid2" src="video2.mp4" playsinline muted autoplay loop></video>
 </div>
 
-<!-- Video 3 -->
+<!-- Third Video -->
 <div class="video-container">
-    <iframe id="video3" src="https://www.youtube.com/embed/2xrGwz23eKs?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <video id="vid3" src="video3.mp4" playsinline muted autoplay loop></video>
 </div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-let players = [];
-
-function onYouTubeIframeAPIReady() {
-    players[0] = new YT.Player('video1');
-    players[1] = new YT.Player('video2');
-    players[2] = new YT.Player('video3');
-}
-
-function pauseAllExcept(currentIndex) {
-    players.forEach((player, index) => {
-        if (index !== currentIndex && player.pauseVideo) {
-            player.pauseVideo();
+function pauseAllExcept(currentVideo) {
+    document.querySelectorAll('video').forEach(video => {
+        if (video !== currentVideo) {
+            video.pause();
         }
     });
 }
 
 function checkWhichVideoInView() {
-    const containers = document.querySelectorAll('.video-container');
-    containers.forEach((container, index) => {
-        const rect = container.getBoundingClientRect();
-        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-            if (players[index] && players[index].playVideo) {
-                players[index].playVideo();
-                pauseAllExcept(index);
-            }
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+        const rect = video.getBoundingClientRect();
+        if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
+            video.play();
+            pauseAllExcept(video);
         }
     });
 }
@@ -82,7 +71,7 @@ window.addEventListener('scroll', () => {
 window.addEventListener('load', () => {
     setTimeout(() => {
         checkWhichVideoInView();
-    }, 1500); // YouTube API needs 1.5 sec to fully ready
+    }, 500);
 });
 </script>
 

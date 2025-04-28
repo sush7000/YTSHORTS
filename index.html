@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Vertical 100 Shorts AutoPlay Mute</title>
+<title>Lightweight 100 Shorts AutoPlay Mute (Mobile Style)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -12,12 +12,12 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
-        padding: 10px 0;
+        gap: 5px;
+        padding: 5px 0;
     }
     iframe {
-        width: 360px; /* YouTube shorts size */
-        height: 640px;
+        width: 240px; /* Chhota size */
+        height: 426px; /* Aspect ratio 9:16 */
         max-width: 100%;
         border: none;
         background: black;
@@ -57,6 +57,12 @@ function shuffle(array) {
     return array;
 }
 
+function extractVideoId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length == 11) ? match[2] : null;
+}
+
 // Fetch videos from Firebase
 firebase.database().ref('videos').once('value').then(snapshot => {
     const videoList = snapshot.val();
@@ -64,29 +70,22 @@ firebase.database().ref('videos').once('value').then(snapshot => {
         const container = document.getElementById('shortsContainer');
         const videos = shuffle(Object.values(videoList));
 
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) { // 50 videos for light version
             const randomVideo = videos[Math.floor(Math.random() * videos.length)];
+            const videoId = extractVideoId(randomVideo);
             
-            // Correct embed URL with autoplay+mute+loop
-            let embedUrl = randomVideo
-                .replace("watch?v=", "embed/")
-                .replace("shorts/", "embed/")
-                + "?autoplay=1&mute=1&loop=1&playlist=" + extractVideoId(randomVideo);
+            if (videoId) {
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&vq=small`;
 
-            const iframe = document.createElement('iframe');
-            iframe.src = embedUrl;
-            iframe.allow = "autoplay; encrypted-media";
-            iframe.allowFullscreen = true;
-            container.appendChild(iframe);
+                const iframe = document.createElement('iframe');
+                iframe.src = embedUrl;
+                iframe.allow = "autoplay; encrypted-media";
+                iframe.allowFullscreen = true;
+                container.appendChild(iframe);
+            }
         }
     }
 });
-
-function extractVideoId(url) {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length == 11) ? match[2] : null;
-}
 </script>
 
 </body>

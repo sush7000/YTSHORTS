@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Final AutoPlay ScrollFix</title>
+<title>Baby Shorts Ultimate Autoplay Control</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -86,7 +86,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0";
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0"; // NO autoplay
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -97,34 +97,32 @@ firebase.database().ref('videos').once('value').then(snapshot => {
     }
 });
 
-// YouTube API Ready
 function onYouTubeIframeAPIReady() {
     const interval = setInterval(() => {
         if (videosReady) {
             clearInterval(interval);
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach((iframe, index) => {
-                players[index] = new YT.Player(iframe.id);
+                players[index] = new YT.Player(iframe.id, {
+                    events: {
+                        'onReady': function (event) {
+                            // Kuch mat karna, initialization ke time koi video start nahi karni
+                        }
+                    }
+                });
             });
 
-            window.addEventListener('scroll', () => {
-                controlPlayback();
-            });
-
-            // Start 1st video
-            setTimeout(() => {
-                controlPlayback();
-            }, 1000);
+            window.addEventListener('scroll', controlPlayback);
+            setTimeout(controlPlayback, 1000); // 1 second me initial playback check
         }
     }, 500);
 }
 
-// Real control playback
+// Ab playback ka full control
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     let activeIndex = -1;
 
-    // Find the currently center video
     wrappers.forEach((wrapper, index) => {
         const rect = wrapper.getBoundingClientRect();
         if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
@@ -132,7 +130,6 @@ function controlPlayback() {
         }
     });
 
-    // Now control all players
     players.forEach((player, index) => {
         if (player && player.playVideo && player.pauseVideo) {
             if (index === activeIndex) {

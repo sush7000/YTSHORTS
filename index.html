@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Responsive YouTube UI</title>
+<title>Shorts Scroll Autoplay - 6 Reels</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -35,77 +35,66 @@
 <body>
 
 <!-- Reel 1 -->
-<div class="shorts-wrapper">
-    <iframe class="video-frame" id="video1"
-        src="https://www.youtube.com/embed/AlFUEdCKmVA?enablejsapi=1&autoplay=1&mute=1"
-        title="कल है exam🤣"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen></iframe>
+<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/3VhqinMGqr8?autoplay=1&mute=1">
+    <iframe class="video-frame" id="video1" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Reel 2 -->
-<div class="shorts-wrapper">
-    <iframe class="video-frame" id="video2"
-        src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&autoplay=0&mute=1"
-        title="Funny video"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen></iframe>
+<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/jDYt-ErLkv4?autoplay=1&mute=1">
+    <iframe class="video-frame" id="video2" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Reel 3 -->
-<div class="shorts-wrapper">
-    <iframe class="video-frame" id="video3"
-        src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&autoplay=0&mute=1"
-        title="Another Shorts"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-        referrerpolicy="strict-origin-when-cross-origin"
-        allowfullscreen></iframe>
+<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/i2CyQf8S7ws?autoplay=1&mute=1">
+    <iframe class="video-frame" id="video3" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
+<!-- Reel 4 -->
+<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/A1L2kLVYWXk?autoplay=1&mute=1">
+    <iframe class="video-frame" id="video4" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
+<!-- Reel 5 -->
+<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/OoSHsZIf3zg?autoplay=1&mute=1">
+    <iframe class="video-frame" id="video5" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
+<!-- Reel 6 -->
+<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/i_4ppiP5TWI?autoplay=1&mute=1">
+    <iframe class="video-frame" id="video6" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+</div>
+
 <script>
-let players = [];
-
-function onYouTubeIframeAPIReady() {
-    players[0] = new YT.Player('video1', { events: { 'onReady': (event) => event.target.playVideo() } });
-    players[1] = new YT.Player('video2');
-    players[2] = new YT.Player('video3');
-}
-
-function pauseAllExcept(currentIndex) {
-    players.forEach((player, idx) => {
-        if (player && idx !== currentIndex && player.pauseVideo) {
-            player.pauseVideo();
-        }
+function resetAllIframes() {
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach(iframe => {
+        iframe.src = '';
     });
 }
 
-function playVisibleVideo() {
+function loadVisibleIframe() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     wrappers.forEach((wrapper, index) => {
         const rect = wrapper.getBoundingClientRect();
+        const iframe = wrapper.querySelector('iframe');
         if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
-            if (players[index] && players[index].playVideo) {
-                players[index].playVideo();
-                pauseAllExcept(index);
+            if (iframe.src === '') {
+                iframe.src = wrapper.getAttribute('data-src');
             }
+        } else {
+            iframe.src = '';
         }
     });
 }
 
 window.addEventListener('scroll', () => {
-    playVisibleVideo();
+    loadVisibleIframe();
 });
 
 window.addEventListener('load', () => {
     setTimeout(() => {
-        playVisibleVideo();
-    }, 1500);
+        loadVisibleIframe();
+    }, 1000);
 });
 </script>
 

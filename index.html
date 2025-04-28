@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Full YouTube UI</title>
+<title>Baby Shorts Full YouTube UI - AutoPlay</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -33,7 +33,7 @@
 <!-- Reel 1 -->
 <div class="shorts-wrapper">
     <iframe id="video1"
-        src="https://www.youtube.com/embed/AlFUEdCKmVA?enablejsapi=1"
+        src="https://www.youtube.com/embed/AlFUEdCKmVA?enablejsapi=1&autoplay=1&mute=1"
         title="कल है exam🤣"
         frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -44,7 +44,7 @@
 <!-- Reel 2 -->
 <div class="shorts-wrapper">
     <iframe id="video2"
-        src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1"
+        src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&autoplay=0&mute=1"
         title="Funny video"
         frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -55,7 +55,7 @@
 <!-- Reel 3 -->
 <div class="shorts-wrapper">
     <iframe id="video3"
-        src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1"
+        src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&autoplay=0&mute=1"
         title="Another Shorts"
         frameborder="0"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -68,7 +68,7 @@
 let players = [];
 
 function onYouTubeIframeAPIReady() {
-    players[0] = new YT.Player('video1');
+    players[0] = new YT.Player('video1', { events: { 'onReady': (event) => event.target.playVideo() } });
     players[1] = new YT.Player('video2');
     players[2] = new YT.Player('video3');
 }

@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Baby Songs</title>
+<title>My Baby Songs - Shorts Mode</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body, html {
+    html, body {
         height: 100%;
-        overflow-y: scroll;
         scroll-snap-type: y mandatory;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        background: black;
     }
     .video-container {
         width: 100%;
@@ -17,7 +19,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        background: black;
+        position: relative;
     }
     iframe {
         width: 100%;
@@ -28,20 +30,46 @@
 </head>
 <body>
 
-<!-- First Video -->
+<!-- Video 1 -->
 <div class="video-container">
-    <iframe src="https://www.youtube.com/embed/HO7CRp44s10?autoplay=1&mute=1&controls=0" allowfullscreen></iframe>
+    <iframe data-src="https://www.youtube.com/embed/HO7CRp44s10?mute=1&controls=0" allowfullscreen></iframe>
 </div>
 
-<!-- Second Video -->
+<!-- Video 2 -->
 <div class="video-container">
-    <iframe src="https://www.youtube.com/embed/u0Y3EHuMktE?autoplay=1&mute=1&controls=0" allowfullscreen></iframe>
+    <iframe data-src="https://www.youtube.com/embed/u0Y3EHuMktE?mute=1&controls=0" allowfullscreen></iframe>
 </div>
 
-<!-- Third Video -->
+<!-- Video 3 -->
 <div class="video-container">
-    <iframe src="https://www.youtube.com/embed/2xrGwz23eKs?autoplay=1&mute=1&controls=0" allowfullscreen></iframe>
+    <iframe data-src="https://www.youtube.com/embed/2xrGwz23eKs?mute=1&controls=0" allowfullscreen></iframe>
 </div>
+
+<script>
+// Function to load only the current visible iframe
+function loadVisibleIframe() {
+    const containers = document.querySelectorAll('.video-container');
+    containers.forEach(container => {
+        const rect = container.getBoundingClientRect();
+        const iframe = container.querySelector('iframe');
+        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+            // Load the video
+            if (!iframe.src) {
+                iframe.src = iframe.getAttribute('data-src') + "&autoplay=1";
+            }
+        } else {
+            // Stop the video
+            iframe.src = '';
+        }
+    });
+}
+
+// Call function when scroll
+window.addEventListener('scroll', loadVisibleIframe);
+
+// Load initially
+window.addEventListener('load', loadVisibleIframe);
+</script>
 
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Auto Mute-Unmute</title>
+<title>Baby Shorts Auto Unmute Scroll Fixed</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -87,7 +87,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0&mute=1&autoplay=1"; // Start muted
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0&mute=1"; // Start muted
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -108,10 +108,7 @@ function onYouTubeIframeAPIReady() {
                 players[index] = new YT.Player(iframe.id, {
                     events: {
                         'onReady': function (event) {
-                            if (index === 0) {
-                                event.target.playVideo();
-                                event.target.unMute(); // Unmute first video after playing
-                            }
+                            // Do nothing on ready
                         }
                     }
                 });
@@ -120,6 +117,8 @@ function onYouTubeIframeAPIReady() {
             window.addEventListener('scroll', () => {
                 controlPlayback();
             });
+
+            controlPlayback(); // initial call
         }
     }, 500);
 }
@@ -134,8 +133,11 @@ function controlPlayback() {
         
         if (player && player.playVideo && player.pauseVideo) {
             if (!centerFound && rect.top >= 0 && rect.top <= window.innerHeight/2) {
+                // Center video
                 player.playVideo();
-                player.unMute(); // Unmute the center playing video
+                setTimeout(() => {
+                    player.unMute(); // Unmute after a small delay
+                }, 500); // 0.5 second delay
                 centerFound = true;
             } else {
                 player.pauseVideo();

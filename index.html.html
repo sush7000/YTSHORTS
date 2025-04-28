@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Baby Shorts</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body, html {
+        height: 100%;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+    }
+    .video-container {
+        width: 100%;
+        height: 100vh;
+        scroll-snap-align: start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: black;
+    }
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="video-container">
+    <iframe src="https://youtu.be/a8Id466cAPo?si=5t4ce-yva3sqsK-C?autoplay=1&mute=1&controls=0" allowfullscreen></iframe>
+</div>
+
+<div class="video-container">
+    <iframe src="https://youtube.com/shorts/FR0jb98YW9w?si=8AxyKFBcinIE95aG?autoplay=1&mute=1&controls=0" allowfullscreen></iframe>
+</div>
+
+<div class="video-container">
+    <iframe src="https://youtube.com/shorts/lIo8eivXHz4?si=GcczftgCvp9QOsEx?autoplay=1&mute=1&controls=0" allowfullscreen></iframe>
+</div>
+
+<!-- More videos as needed -->
+
+</body>
+</html>

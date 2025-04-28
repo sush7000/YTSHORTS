@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Baby Songs - Shorts Mode</title>
+<title>My Baby Reels</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -32,43 +32,62 @@
 
 <!-- Video 1 -->
 <div class="video-container">
-    <iframe data-src="https://www.youtube.com/embed/HO7CRp44s10?mute=1&controls=0" allowfullscreen></iframe>
+    <iframe id="video1" src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Video 2 -->
 <div class="video-container">
-    <iframe data-src="https://www.youtube.com/embed/u0Y3EHuMktE?mute=1&controls=0" allowfullscreen></iframe>
+    <iframe id="video2" src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Video 3 -->
 <div class="video-container">
-    <iframe data-src="https://www.youtube.com/embed/2xrGwz23eKs?mute=1&controls=0" allowfullscreen></iframe>
+    <iframe id="video3" src="https://www.youtube.com/embed/2xrGwz23eKs?enablejsapi=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
 <script>
-// Function to load only the current visible iframe
-function loadVisibleIframe() {
-    const containers = document.querySelectorAll('.video-container');
-    containers.forEach(container => {
-        const rect = container.getBoundingClientRect();
-        const iframe = container.querySelector('iframe');
-        if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-            // Load the video
-            if (!iframe.src) {
-                iframe.src = iframe.getAttribute('data-src') + "&autoplay=1";
-            }
-        } else {
-            // Stop the video
-            iframe.src = '';
+let players = [];
+
+function onYouTubeIframeAPIReady() {
+    players = [
+        new YT.Player('video1'),
+        new YT.Player('video2'),
+        new YT.Player('video3')
+    ];
+}
+
+function pauseAllExcept(current) {
+    players.forEach((player, index) => {
+        if (index !== current) {
+            player.pauseVideo();
         }
     });
 }
 
-// Call function when scroll
-window.addEventListener('scroll', loadVisibleIframe);
+function checkWhichVideoInView() {
+    const containers = document.querySelectorAll('.video-container');
+    containers.forEach((container, index) => {
+        const rect = container.getBoundingClientRect();
+        if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
+            // Play this video and pause others
+            if (players[index] && players[index].playVideo) {
+                players[index].playVideo();
+                pauseAllExcept(index);
+            }
+        }
+    });
+}
 
-// Load initially
-window.addEventListener('load', loadVisibleIframe);
+window.addEventListener('scroll', () => {
+    checkWhichVideoInView();
+});
+
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        checkWhichVideoInView();
+    }, 1000); // little delay to ensure API ready
+});
 </script>
 
 </body>

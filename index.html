@@ -2,48 +2,48 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Final</title>
+<title>Baby Reels - Shorts UI</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body {
-    height: 100%;
-    scroll-snap-type: y mandatory;
-    overflow-y: scroll;
-    scroll-behavior: smooth;
-    background: black;
-  }
-  .video-container {
-    width: 100%;
-    height: 100vh;
-    scroll-snap-align: start;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+        height: 100%;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        scroll-behavior: smooth;
+        background: black;
+    }
+    .shorts-wrapper {
+        width: 100%;
+        height: 100vh;
+        scroll-snap-align: start;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+    iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
 </style>
 </head>
 <body>
 
-<!-- Preload all videos -->
-<div class="video-container">
-  <iframe id="player1" src="https://www.youtube.com/embed/MiJm20S3Q4Q?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<!-- Shorts Reel 1 -->
+<div class="shorts-wrapper">
+    <iframe id="video1" src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&controls=0&rel=0&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
-<div class="video-container">
-  <iframe id="player2" src="https://www.youtube.com/embed/JISgFgm9KJU?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<!-- Shorts Reel 2 -->
+<div class="shorts-wrapper">
+    <iframe id="video2" src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&controls=0&rel=0&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
-<div class="video-container">
-  <iframe id="player3" src="https://www.youtube.com/embed/8j7sT-SVX5w?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<div class="video-container">
-  <iframe id="player4" src="https://www.youtube.com/embed/mu_nuZKDY1g?enablejsapi=1&mute=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+<!-- Shorts Reel 3 -->
+<div class="shorts-wrapper">
+    <iframe id="video3" src="https://www.youtube.com/embed/2xrGwz23eKs?enablejsapi=1&controls=0&rel=0&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -51,41 +51,42 @@
 let players = [];
 
 function onYouTubeIframeAPIReady() {
-  players.push(new YT.Player('player1'));
-  players.push(new YT.Player('player2'));
-  players.push(new YT.Player('player3'));
-  players.push(new YT.Player('player4'));
+    players = [
+        new YT.Player('video1'),
+        new YT.Player('video2'),
+        new YT.Player('video3')
+    ];
 }
 
 function pauseAllExcept(indexToPlay) {
-  players.forEach((player, index) => {
-    if (index !== indexToPlay && player.pauseVideo) {
-      player.pauseVideo();
-    }
-  });
+    players.forEach((player, idx) => {
+        if (player && idx !== indexToPlay) {
+            player.pauseVideo();
+        }
+    });
 }
 
-function checkWhichVideoInView() {
-  const containers = document.querySelectorAll('.video-container');
-  containers.forEach((container, index) => {
-    const rect = container.getBoundingClientRect();
-    if (rect.top >= 0 && rect.top <= window.innerHeight / 2) {
-      if (players[index] && players[index].playVideo) {
-        players[index].playVideo();
-        pauseAllExcept(index);
-      }
-    }
-  });
+function playVisibleVideo() {
+    const wrappers = document.querySelectorAll('.shorts-wrapper');
+    wrappers.forEach((wrapper, index) => {
+        const rect = wrapper.getBoundingClientRect();
+        if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
+            if (players[index] && players[index].playVideo) {
+                players[index].playVideo();
+                pauseAllExcept(index);
+            }
+        }
+    });
 }
 
 window.addEventListener('scroll', () => {
-  checkWhichVideoInView();
+    playVisibleVideo();
 });
 
 window.addEventListener('load', () => {
-  setTimeout(() => {
-    checkWhichVideoInView();
-  }, 1000); // Thoda delay jab tak API load ho
+    setTimeout(() => {
+        playVisibleVideo();
+    }, 1500); // wait for iframe API to fully initialize
 });
 </script>
 

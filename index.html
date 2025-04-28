@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts AutoPlay Firebase</title>
+<title>Baby Shorts AutoPlay Firebase (No Blank)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -32,18 +32,21 @@
     }
 </style>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+<!-- YouTube Iframe API -->
+<script src="https://www.youtube.com/iframe_api"></script>
 
 </head>
 <body>
 
-<!-- Shorts container -->
+<!-- Container -->
 <div id="shortsContainer"></div>
 
 <script>
-// Your Firebase Config
+// Firebase Config - apna config paste karo yaha
 const firebaseConfig = {
   apiKey: "TUMHARA_API_KEY",
   authDomain: "TUMHARA_PROJECT_ID.firebaseapp.com",
@@ -57,62 +60,52 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-}
+let players = [];
+let videosReady = false;
 
+// Firebase se videos load karo
 firebase.database().ref('videos').once('value').then(snapshot => {
     const videoList = snapshot.val();
     const container = document.getElementById('shortsContainer');
-    
+
     if (videoList) {
-        const shuffledVideos = shuffle(Object.values(videoList));
-        
-        shuffledVideos.forEach((videoUrl, index) => {
+        const videos = Object.values(videoList);
+        videos.forEach((videoUrl, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'shorts-wrapper';
-            
+
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&autoplay=0&controls=1"; // controls = 1 -> full control
-            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=1"; // mute nahi kiya
+            iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
-            
+
             wrapper.appendChild(iframe);
             container.appendChild(wrapper);
         });
-
-        setupYouTubeAPI();
+        videosReady = true;
     }
 });
 
-function setupYouTubeAPI() {
-    const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-}
-
-let players = [];
-
+// YouTube iframe API ready
 function onYouTubeIframeAPIReady() {
-    const iframes = document.querySelectorAll('iframe');
-    iframes.forEach((iframe, index) => {
-        players[index] = new YT.Player(iframe.id);
-    });
-
-    window.addEventListener('scroll', () => {
-        controlPlayback();
-    });
-
-    controlPlayback();
+    const interval = setInterval(() => {
+        if (videosReady) {
+            clearInterval(interval);
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach((iframe, index) => {
+                players[index] = new YT.Player(iframe.id);
+            });
+            window.addEventListener('scroll', () => {
+                controlPlayback();
+            });
+            controlPlayback();
+        }
+    }, 500);
 }
 
+// Scroll par video play/pause
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     wrappers.forEach((wrapper, index) => {

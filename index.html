@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Lightweight 100 Shorts AutoPlay Mute (Mobile Style)</title>
+<title>Lite Mobile Reels - AutoPlay Mute</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -16,8 +16,8 @@
         padding: 5px 0;
     }
     iframe {
-        width: 240px; /* Chhota size */
-        height: 426px; /* Aspect ratio 9:16 */
+        width: 240px;
+        height: 426px;
         max-width: 100%;
         border: none;
         background: black;
@@ -70,12 +70,12 @@ firebase.database().ref('videos').once('value').then(snapshot => {
         const container = document.getElementById('shortsContainer');
         const videos = shuffle(Object.values(videoList));
 
-        for (let i = 0; i < 50; i++) { // 50 videos for light version
+        for (let i = 0; i < 50; i++) { // 50 videos for super lite version
             const randomVideo = videos[Math.floor(Math.random() * videos.length)];
             const videoId = extractVideoId(randomVideo);
             
             if (videoId) {
-                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&vq=small`;
+                const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&vq=small`;
 
                 const iframe = document.createElement('iframe');
                 iframe.src = embedUrl;

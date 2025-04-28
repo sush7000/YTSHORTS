@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>My Baby Reels</title>
+<title>My Reels - Baby Mode</title>
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -19,7 +19,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative;
     }
     iframe {
         width: 100%;
@@ -32,17 +31,17 @@
 
 <!-- Video 1 -->
 <div class="video-container">
-    <iframe id="video1" src="https://www.youtube.com/embed/HO7CRp44s10?enablejsapi=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <iframe id="video1" data-src="https://www.youtube.com/embed/HO7CRp44s10?mute=1&controls=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Video 2 -->
 <div class="video-container">
-    <iframe id="video2" src="https://www.youtube.com/embed/u0Y3EHuMktE?enablejsapi=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <iframe id="video2" data-src="https://www.youtube.com/embed/u0Y3EHuMktE?mute=1&controls=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <!-- Video 3 -->
 <div class="video-container">
-    <iframe id="video3" src="https://www.youtube.com/embed/2xrGwz23eKs?enablejsapi=1&controls=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    <iframe id="video3" data-src="https://www.youtube.com/embed/2xrGwz23eKs?mute=1&controls=0&enablejsapi=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 </div>
 
 <script src="https://www.youtube.com/iframe_api"></script>
@@ -50,16 +49,14 @@
 let players = [];
 
 function onYouTubeIframeAPIReady() {
-    players = [
-        new YT.Player('video1'),
-        new YT.Player('video2'),
-        new YT.Player('video3')
-    ];
+    document.querySelectorAll('iframe').forEach((iframe, index) => {
+        players[index] = new YT.Player(iframe.id);
+    });
 }
 
 function pauseAllExcept(current) {
-    players.forEach((player, index) => {
-        if (index !== current) {
+    players.forEach((player, idx) => {
+        if (idx !== current && player.pauseVideo) {
             player.pauseVideo();
         }
     });
@@ -70,7 +67,6 @@ function checkWhichVideoInView() {
     containers.forEach((container, index) => {
         const rect = container.getBoundingClientRect();
         if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
-            // Play this video and pause others
             if (players[index] && players[index].playVideo) {
                 players[index].playVideo();
                 pauseAllExcept(index);
@@ -86,7 +82,7 @@ window.addEventListener('scroll', () => {
 window.addEventListener('load', () => {
     setTimeout(() => {
         checkWhichVideoInView();
-    }, 1000); // little delay to ensure API ready
+    }, 1500);
 });
 </script>
 

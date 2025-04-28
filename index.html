@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts AutoPlay Fixed</title>
+<title>Baby Shorts Full AutoPlay StopFix</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -98,6 +98,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
     }
 });
 
+// YouTube API Ready
 function onYouTubeIframeAPIReady() {
     const interval = setInterval(() => {
         if (videosReady) {
@@ -108,7 +109,7 @@ function onYouTubeIframeAPIReady() {
                     events: {
                         'onReady': function (event) {
                             if (index === 0) {
-                                event.target.playVideo(); // Start first video
+                                event.target.playVideo(); // Play first video
                             }
                         }
                     }
@@ -122,14 +123,20 @@ function onYouTubeIframeAPIReady() {
     }, 500);
 }
 
+// Real control playback
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
+    let centerFound = false;
+
     wrappers.forEach((wrapper, index) => {
         const rect = wrapper.getBoundingClientRect();
         const player = players[index];
+        
         if (player && player.playVideo && player.pauseVideo) {
-            if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
+            if (!centerFound && rect.top >= 0 && rect.top <= window.innerHeight/2) {
+                // Center video mila
                 player.playVideo();
+                centerFound = true;
             } else {
                 player.pauseVideo();
             }

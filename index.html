@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts AutoPlay Firebase (No Blank)</title>
+<title>Baby Shorts AutoPlay (Firebase Random)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -32,29 +33,29 @@
     }
 </style>
 
-<!-- Firebase SDK -->
+<!-- Firebase App SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<!-- Firebase Database SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
 <!-- YouTube Iframe API -->
 <script src="https://www.youtube.com/iframe_api"></script>
 
 </head>
 <body>
 
-<!-- Container -->
+<!-- Container for Videos -->
 <div id="shortsContainer"></div>
 
 <script>
-// Firebase Config - apna config paste karo yaha
+// --- Your Firebase Config ---
 const firebaseConfig = {
-  apiKey: "TUMHARA_API_KEY",
-  authDomain: "TUMHARA_PROJECT_ID.firebaseapp.com",
-  databaseURL: "https://TUMHARA_PROJECT_ID-default-rtdb.firebaseio.com",
-  projectId: "TUMHARA_PROJECT_ID",
-  storageBucket: "TUMHARA_PROJECT_ID.appspot.com",
-  messagingSenderId: "TUMHARA_SENDER_ID",
-  appId: "TUMHARA_APP_ID"
+  apiKey: "AIzaSyDz-SNVEJI-grCYJcpaHQ4aIDIwIWaeBt8",
+  authDomain: "mynotes-24988.firebaseapp.com",
+  databaseURL: "https://mynotes-24988-default-rtdb.firebaseio.com",
+  projectId: "mynotes-24988",
+  storageBucket: "mynotes-24988.firebasestorage.app",
+  messagingSenderId: "599177137893",
+  appId: "1:599177137893:web:8eac4ceb0869ebcca4ce0c"
 };
 
 firebase.initializeApp(firebaseConfig);
@@ -63,13 +64,22 @@ const db = firebase.database();
 let players = [];
 let videosReady = false;
 
-// Firebase se videos load karo
+// Shuffle Function
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Fetch videos from Firebase
 firebase.database().ref('videos').once('value').then(snapshot => {
     const videoList = snapshot.val();
     const container = document.getElementById('shortsContainer');
 
     if (videoList) {
-        const videos = Object.values(videoList);
+        const videos = shuffle(Object.values(videoList));
         videos.forEach((videoUrl, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'shorts-wrapper';
@@ -77,7 +87,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=1"; // mute nahi kiya
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=1"; // controls=1 to allow volume, seek
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -88,7 +98,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
     }
 });
 
-// YouTube iframe API ready
+// Wait for videos + YouTube API
 function onYouTubeIframeAPIReady() {
     const interval = setInterval(() => {
         if (videosReady) {
@@ -97,6 +107,7 @@ function onYouTubeIframeAPIReady() {
             iframes.forEach((iframe, index) => {
                 players[index] = new YT.Player(iframe.id);
             });
+
             window.addEventListener('scroll', () => {
                 controlPlayback();
             });
@@ -105,7 +116,7 @@ function onYouTubeIframeAPIReady() {
     }, 500);
 }
 
-// Scroll par video play/pause
+// Control playback during scroll
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     wrappers.forEach((wrapper, index) => {

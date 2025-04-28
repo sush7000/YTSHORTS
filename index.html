@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Shorts Scroll Autoplay - 6 Reels</title>
+<title>Baby Shorts AutoPlay Firebase</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -21,7 +21,7 @@
         justify-content: center;
         align-items: center;
         overflow: hidden;
-        padding: 10px;
+        padding: 5px;
     }
     .video-frame {
         width: 100%;
@@ -31,71 +31,100 @@
         background: black;
     }
 </style>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
 </head>
 <body>
 
-<!-- Reel 1 -->
-<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/3VhqinMGqr8?autoplay=1&mute=1">
-    <iframe class="video-frame" id="video1" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<!-- Reel 2 -->
-<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/jDYt-ErLkv4?autoplay=1&mute=1">
-    <iframe class="video-frame" id="video2" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<!-- Reel 3 -->
-<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/i2CyQf8S7ws?autoplay=1&mute=1">
-    <iframe class="video-frame" id="video3" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<!-- Reel 4 -->
-<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/A1L2kLVYWXk?autoplay=1&mute=1">
-    <iframe class="video-frame" id="video4" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<!-- Reel 5 -->
-<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/OoSHsZIf3zg?autoplay=1&mute=1">
-    <iframe class="video-frame" id="video5" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
-
-<!-- Reel 6 -->
-<div class="shorts-wrapper" data-src="https://www.youtube.com/embed/i_4ppiP5TWI?autoplay=1&mute=1">
-    <iframe class="video-frame" id="video6" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-</div>
+<!-- Shorts container -->
+<div id="shortsContainer"></div>
 
 <script>
-function resetAllIframes() {
-    const iframes = document.querySelectorAll('iframe');
-    iframes.forEach(iframe => {
-        iframe.src = '';
-    });
+// Your Firebase Config
+const firebaseConfig = {
+  apiKey: "TUMHARA_API_KEY",
+  authDomain: "TUMHARA_PROJECT_ID.firebaseapp.com",
+  databaseURL: "https://TUMHARA_PROJECT_ID-default-rtdb.firebaseio.com",
+  projectId: "TUMHARA_PROJECT_ID",
+  storageBucket: "TUMHARA_PROJECT_ID.appspot.com",
+  messagingSenderId: "TUMHARA_SENDER_ID",
+  appId: "TUMHARA_APP_ID"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
 
-function loadVisibleIframe() {
+firebase.database().ref('videos').once('value').then(snapshot => {
+    const videoList = snapshot.val();
+    const container = document.getElementById('shortsContainer');
+    
+    if (videoList) {
+        const shuffledVideos = shuffle(Object.values(videoList));
+        
+        shuffledVideos.forEach((videoUrl, index) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'shorts-wrapper';
+            
+            const iframe = document.createElement('iframe');
+            iframe.className = 'video-frame';
+            iframe.id = `video${index}`;
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&autoplay=0&controls=1"; // controls = 1 -> full control
+            iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+            iframe.allowFullscreen = true;
+            
+            wrapper.appendChild(iframe);
+            container.appendChild(wrapper);
+        });
+
+        setupYouTubeAPI();
+    }
+});
+
+function setupYouTubeAPI() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
+
+let players = [];
+
+function onYouTubeIframeAPIReady() {
+    const iframes = document.querySelectorAll('iframe');
+    iframes.forEach((iframe, index) => {
+        players[index] = new YT.Player(iframe.id);
+    });
+
+    window.addEventListener('scroll', () => {
+        controlPlayback();
+    });
+
+    controlPlayback();
+}
+
+function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     wrappers.forEach((wrapper, index) => {
         const rect = wrapper.getBoundingClientRect();
-        const iframe = wrapper.querySelector('iframe');
-        if (rect.top >= 0 && rect.top <= window.innerHeight/2) {
-            if (iframe.src === '') {
-                iframe.src = wrapper.getAttribute('data-src');
-            }
-        } else {
-            iframe.src = '';
+        const player = players[index];
+        if (player && player.playVideo && rect.top >= 0 && rect.top <= window.innerHeight / 2) {
+            player.playVideo();
+        } else if (player && player.pauseVideo) {
+            player.pauseVideo();
         }
     });
 }
-
-window.addEventListener('scroll', () => {
-    loadVisibleIframe();
-});
-
-window.addEventListener('load', () => {
-    setTimeout(() => {
-        loadVisibleIframe();
-    }, 1000);
-});
 </script>
 
 </body>

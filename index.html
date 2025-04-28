@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Ultimate Autoplay Control</title>
+<title>Baby Shorts Perfect AutoPlay</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -86,7 +86,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0"; // NO autoplay
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0";
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -103,22 +103,25 @@ function onYouTubeIframeAPIReady() {
             clearInterval(interval);
             const iframes = document.querySelectorAll('iframe');
             iframes.forEach((iframe, index) => {
-                players[index] = new YT.Player(iframe.id, {
-                    events: {
-                        'onReady': function (event) {
-                            // Kuch mat karna, initialization ke time koi video start nahi karni
-                        }
-                    }
-                });
+                players[index] = new YT.Player(iframe.id);
             });
 
             window.addEventListener('scroll', controlPlayback);
-            setTimeout(controlPlayback, 1000); // 1 second me initial playback check
+
+            // After a small delay, auto-play first reel
+            setTimeout(() => {
+                playFirstVideo();
+            }, 1000);
         }
     }, 500);
 }
 
-// Ab playback ka full control
+function playFirstVideo() {
+    if (players[0] && players[0].playVideo) {
+        players[0].playVideo();
+    }
+}
+
 function controlPlayback() {
     const wrappers = document.querySelectorAll('.shorts-wrapper');
     let activeIndex = -1;

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Baby Shorts Auto Unmute Scroll Fixed</title>
+<title>Baby Shorts FINAL AutoPlay Fixed</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -64,7 +64,6 @@ const db = firebase.database();
 let players = [];
 let videosReady = false;
 
-// Shuffle Function
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -73,7 +72,6 @@ function shuffle(array) {
     return array;
 }
 
-// Fetch videos from Firebase
 firebase.database().ref('videos').once('value').then(snapshot => {
     const videoList = snapshot.val();
     const container = document.getElementById('shortsContainer');
@@ -87,7 +85,7 @@ firebase.database().ref('videos').once('value').then(snapshot => {
             const iframe = document.createElement('iframe');
             iframe.className = 'video-frame';
             iframe.id = `video${index}`;
-            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0&mute=1"; // Start muted
+            iframe.src = videoUrl + "?enablejsapi=1&rel=0&controls=0&mute=1&autoplay=1"; // Autoplay + Mute
             iframe.allow = "autoplay; encrypted-media";
             iframe.allowFullscreen = true;
 
@@ -108,7 +106,7 @@ function onYouTubeIframeAPIReady() {
                 players[index] = new YT.Player(iframe.id, {
                     events: {
                         'onReady': function (event) {
-                            // Do nothing on ready
+                            // No action on ready
                         }
                     }
                 });
@@ -118,7 +116,7 @@ function onYouTubeIframeAPIReady() {
                 controlPlayback();
             });
 
-            controlPlayback(); // initial call
+            controlPlayback(); // Initial call
         }
     }, 500);
 }
@@ -133,11 +131,10 @@ function controlPlayback() {
         
         if (player && player.playVideo && player.pauseVideo) {
             if (!centerFound && rect.top >= 0 && rect.top <= window.innerHeight/2) {
-                // Center video
                 player.playVideo();
-                setTimeout(() => {
-                    player.unMute(); // Unmute after a small delay
-                }, 500); // 0.5 second delay
+                try {
+                    player.unMute(); // Try to unmute
+                } catch (e) {}
                 centerFound = true;
             } else {
                 player.pauseVideo();
